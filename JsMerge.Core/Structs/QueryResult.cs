@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JsMerge.Core
+﻿namespace JsMerge.Core
 {
 	public struct QueryResult
 	{
 		public readonly QueryResultType type;
-		public readonly object? result;
+		public readonly object? value;
+		public readonly string origin;
 
-		public QueryResult(QueryResultType type, object? result)
+		public QueryResult(QueryResultType type, object? value, string origin = "")
 		{
 			this.type = type;
-			this.result = result;
+			this.value = value;
+			this .origin = origin;
 		}
 		
 		/// <summary>

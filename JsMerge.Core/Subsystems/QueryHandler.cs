@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace JsMerge.Core
 {
@@ -95,22 +91,22 @@ namespace JsMerge.Core
 		/// <returns></returns>
 		public QueryResult Execute(string filePath)
 		{
-			// "/src/*"
-			// "^/src/*
-			// "$/src/*
-			// "#/src/*
-			// "@/src/*
-
-			// :function()
-			// ^regex.*
-			Regex regexp = new Regex(filePath);
 			// Get all js files in our work directory
-			string[] files = Directory.GetFiles(Main.WorkDirectory, "*.js")
-			// And select all that match our regex path pattern
-				.Where(file => regexp.IsMatch(file)).ToArray();
+			string[] files = Directory.GetFiles(Main.WorkDirectory, filePath, SearchOption.AllDirectories)
+				// Select only the found js files
+				.Where(file => Path.GetExtension(file) == ".js").ToArray();
+
+			// Sort our files
+			files = SortFiles(files);
 
 			// Create our query result with our file list
 			return new QueryResult(QueryResultType.FileList, files);
+		}
+
+		private string[] SortFiles(string[] files)
+		{
+			// Sort the files by length
+			return files.OrderBy(file => file).ToArray();
 		}
 	}
 
@@ -139,7 +135,7 @@ namespace JsMerge.Core
 			string contents = new HttpClient().GetStringAsync(url).Result;
 
 			// Create our query result with our file contents
-			return new QueryResult(QueryResultType.String, contents);
+			return new QueryResult(QueryResultType.String, contents, url);
 		}
 		#endregion
 	}

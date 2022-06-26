@@ -11,13 +11,21 @@ namespace JsMerge
 				GetWorkdir(args.Length > 1 ? args[0] : null)
 			);
 
-			// Test the query system
+			// Check if a config is present
 			//
-			var files = Core.Main.ExecuteQuery("/*");
-			var jquery = Core.Main.ExecuteQuery(":get(https://code.jquery.com/jquery-3.3.1.slim.min.js)");
+			if (Core.Main.Config == null)
+			{
+				Console.WriteLine($"No .jsmerge config file found in {Core.Main.WorkDirectory}");
+				return;
+			}
 
-			Console.WriteLine($"{files.type}: {files.result}");
-			Console.WriteLine($"{jquery.type}: {jquery.result}");
+			// Create a new merge file for each config item
+			//
+			foreach (KeyValuePair<string, MergeConfig> configItem in Core.Main.Config)
+			{
+				MergeResult result = Core.Main.Merge(configItem.Key, configItem.Value);
+				result.Save();
+			}
 		}
 
 		/// <summary>
