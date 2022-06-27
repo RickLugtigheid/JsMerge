@@ -6,10 +6,13 @@ namespace JsMerge
 	{
 		static void Main(string[] args)
 		{
+			Options options = new Options(args);
+
 			// Initialize our Main class with our current directory
 			Core.Main.Initialize(
-				GetWorkdir(args.Length > 1 ? args[0] : null)
+				GetWorkdir(options)
 			);
+			Core.Main.Log.verbosity = options.Verbosity;
 
 			// Check if a config is present
 			//
@@ -33,26 +36,27 @@ namespace JsMerge
 		/// </summary>
 		/// <param name="argument"></param>
 		/// <returns>Work directory</returns>
-		static string GetWorkdir(string? argument)
+		static string GetWorkdir(Options options)
 		{
+			// Set our result to the current work directory
 			string result = Environment.CurrentDirectory;
 
 			// Check if an argument is given
 			//
-			if (argument == null || argument == string.Empty)
+			if (options.WorkDirectory == null || options.WorkDirectory == string.Empty)
 			{
 				return result;
 			}
 
 			// Check if the given argument is an addition to the current work directory
 			//
-			if (argument.StartsWith('.'))
+			if (options.WorkDirectory.StartsWith('.'))
 			{
-				return result + argument;
+				return result + '/' + options.WorkDirectory;
 			}
 
 			// Return the argument as full path (if a full path is given)
-			return argument;
+			return options.WorkDirectory;
 		}
 	}
 }

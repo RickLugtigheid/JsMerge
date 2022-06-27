@@ -12,3 +12,8 @@
 - Added: Creating merge files
 - Added: Minify option
 - Fixed: Not reading files in the correct order
+
+## 1.27.06.2022
+- Added: Console arguments
+- Added: Logging
+- Added: Setting verbosity level

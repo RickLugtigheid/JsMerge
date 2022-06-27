@@ -28,6 +28,7 @@ namespace JsMerge.Core
 				case QueryResultType.FileList:
 					foreach (string file in queryResult.value as string[])
 					{
+						Main.Log.Verbose("merging: " + file, 2);
 						// If in debug mode add the name of the file where the following contents came from
 						//
 						if (config.debug)
@@ -45,6 +46,7 @@ namespace JsMerge.Core
 					break;
 
 				case QueryResultType.String:
+					Main.Log.Verbose("merging: " + queryResult.origin, 2);
 					// If in debug mode add the origin where the following contents came from
 					//
 					if (config.debug)
@@ -88,10 +90,12 @@ namespace JsMerge.Core
 
 			// Create a new file with the given name
 			//
-			using (StreamWriter stream = new StreamWriter(dirOut + '/' + fileName + ".js"))
+			string fileOut = dirOut + '/' + fileName + ".js";
+			using (StreamWriter stream = new StreamWriter(fileOut))
 			{
 				stream.Write(contents);
 			}
+			Main.Log.Verbose("[Merge]: Saved to '" + fileOut + '\'', 1);
 		}
 	}
 }

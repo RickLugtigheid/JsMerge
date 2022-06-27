@@ -10,6 +10,10 @@ namespace JsMerge.Core
 		/// A subsystem for handling query strings
 		/// </summary>
 		public static QueryHandler Query { get; private set; }
+		/// <summary>
+		/// A subsystem for handling logging
+		/// </summary>
+		public static LogWriter Log { get; private set; }
 		#endregion
 		public static Dictionary<string, MergeConfig>? Config { get; private set; }
 
@@ -25,8 +29,9 @@ namespace JsMerge.Core
 
 			// Create our subsystem objects
 			//
-			Query = new QueryHandler();
-			Config = new Dictionary<string, MergeConfig>();
+			Query	= new QueryHandler();
+			Log		= new LogWriter();
+			Config	= new Dictionary<string, MergeConfig>();
 
 			// Check if a config file is present
 			//
@@ -38,6 +43,10 @@ namespace JsMerge.Core
 					Config = JsonConvert.DeserializeObject<Dictionary<string, MergeConfig>>(stream.ReadToEnd());
 				}
 			}
+			else
+			{
+				Log.Error("No .jsmerge config file found in '" + workDirectory + '\'');
+			}
 		}
 
 		/// <summary>
@@ -47,6 +56,7 @@ namespace JsMerge.Core
 		/// <param name="config"></param>
 		public static MergeResult Merge(string fileName, MergeConfig config)
 		{
+			Log.Verbose("[Merge]: Started for '" + fileName + '\'', 1);
 			// Create a new merge result
 			//
 			MergeResult result = new MergeResult(fileName, config);
@@ -72,6 +82,8 @@ namespace JsMerge.Core
 		/// <returns></returns>
 		public static QueryResult ExecuteQuery(string query)
 		{
+			Log.Verbose("[Query]: Executing '" + query + '\'', 3);
+
 			QueryResult result = QueryResult.Empty;
 			// Check if our query is a function
 			if (Query.IsFunction(query))
