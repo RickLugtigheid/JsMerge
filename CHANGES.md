@@ -10,4 +10,5 @@
 ### 1.26.06.2022-b
 - Added: .jsmerge config reading
 - Added: Creating merge files
+- Added: Minify option
 - Fixed: Not reading files in the correct order

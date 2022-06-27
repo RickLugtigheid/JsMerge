@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using DouglasCrockford.JsMin;
+using System.Text;
 
 namespace JsMerge.Core
 {
@@ -62,6 +63,9 @@ namespace JsMerge.Core
 		/// </summary>
 		public void Save()
 		{
+			string contents = _contents.ToString();
+			string fileName = _fileName;
+
 			// Get out output directory
 			//
 			string dirOut = Main.WorkDirectory;
@@ -70,11 +74,23 @@ namespace JsMerge.Core
 				dirOut += '/' + config.dirOut;
 			}
 
+			// Check if our contents should be minified
+			//
+			if (config.minify)
+			{
+				contents = new JsMinifier().Minify(_contents.ToString());
+
+				// Also remove newlines since the package doesn't do that automaticly
+				contents = contents.ReplaceLineEndings(string.Empty);
+
+				fileName += ".min";
+			}
+
 			// Create a new file with the given name
 			//
-			using (StreamWriter stream = new StreamWriter(dirOut + '/' + _fileName + ".js"))
+			using (StreamWriter stream = new StreamWriter(dirOut + '/' + fileName + ".js"))
 			{
-				stream.Write(_contents.ToString());
+				stream.Write(contents);
 			}
 		}
 	}
