@@ -23,6 +23,8 @@
                         "type": "string",
                         "examples": [
                             "./",
+                            "./js/*",
+                            "./src/*",
                             ":get()"
                         ]
                     }
@@ -31,7 +33,10 @@
                     "type": "string",
                     "description": "The output directory for the resulting merge file"
                 }
-            }
+            },
+            "required": [
+                "include"
+            ]
         }
     }
 }
