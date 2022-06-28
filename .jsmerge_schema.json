@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "jsmerge-schema#v1",
+    "type": "object",
+    "patternProperties": {
+        ".{1,}": {
+            "type": "object",
+            "properties": {
+                "debug": {
+                    "type": "boolean",
+                    "description": "If '<<<<<<<< filename.js' should be added every time a file is merged into the merge file",
+                    "default": false
+                },     
+                "minify": {
+                    "type": "boolean",
+                    "description": "If the resulting merge file should be minified",
+                    "default": false
+                },
+                "include": {
+                    "type": "array",
+                    "description": "An array of queries/functions that point to the files we want to include in our resulting merge file",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "./",
+                            ":get()"
+                        ]
+                    }
+                },
+                "dirOut": {
+                    "type": "string",
+                    "description": "The output directory for the resulting merge file"
+                }
+            }
+        }
+    }
+}
