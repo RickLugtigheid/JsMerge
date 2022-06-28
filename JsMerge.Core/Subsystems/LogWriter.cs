@@ -30,7 +30,17 @@ namespace JsMerge.Core
 		public void Error(string message)
 		{
 			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("Error: " + message);
+			Console.WriteLine("[Error]: " + message);
+			Console.ResetColor();
+		}
+		/// <summary>
+		/// Logs a message as an warning
+		/// </summary>
+		/// <param name="message">Message to log</param>
+		public void Warning(string message)
+		{
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.WriteLine("[Warning]: " + message);
 			Console.ResetColor();
 		}
 	}
