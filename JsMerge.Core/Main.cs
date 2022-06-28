@@ -77,6 +77,14 @@ namespace JsMerge.Core
 		/// <param name="config"></param>
 		public static MergeResult Merge(string fileName, MergeConfig config)
 		{
+			// Check if 'include' property is given
+			//
+			if (config.include == null)
+			{
+				Log.Error($".jsmerge - {fileName}.include not set!");
+				Environment.Exit(-1);
+			}
+
 			Log.Verbose("[Merge]: Started for '" + fileName + '\'', 1);
 			// Create a new merge result
 			//
