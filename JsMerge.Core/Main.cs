@@ -40,13 +40,34 @@ namespace JsMerge.Core
 				// Load our config
 				using (StreamReader stream = new StreamReader(WorkDirectory + "/.jsmerge"))
 				{
-					Config = JsonConvert.DeserializeObject<Dictionary<string, MergeConfig>>(stream.ReadToEnd());
+					Config = JsonConvert.DeserializeObject<Dictionary<string, MergeConfig>>(stream.ReadToEnd(), new JsonSerializerSettings()
+					{
+						Error = HandleConfigDeserializationError
+					});
 				}
 			}
 			else
 			{
 				Log.Error("No .jsmerge config file found in '" + workDirectory + '\'');
 			}
+		}
+
+		private static void HandleConfigDeserializationError(object sender, Newtonsoft.Json.Serialization.ErrorEventArgs e)
+		{
+			Exception exception = e.ErrorContext.Error;
+
+			// Check if the line we have an error on is the schema line
+			bool isSchema = exception.Message.Contains("$schema");
+
+			// If we do not have an error on the schema line we log what went wrong so the user can fix the syntax issue
+			//
+			if (!isSchema)
+			{
+				Log.Warning($"'{exception.Message}' when parsing '.jsmerge' file");
+			}
+
+			// Set the error as Handled so the parser can continue
+			e.ErrorContext.Handled = true;
 		}
 
 		/// <summary>
@@ -56,6 +77,14 @@ namespace JsMerge.Core
 		/// <param name="config"></param>
 		public static MergeResult Merge(string fileName, MergeConfig config)
 		{
+			// Check if 'include' property is given
+			//
+			if (config.include == null)
+			{
+				Log.Error($".jsmerge - {fileName}.include not set!");
+				Environment.Exit(-1);
+			}
+
 			Log.Verbose("[Merge]: Started for '" + fileName + '\'', 1);
 			// Create a new merge result
 			//
