@@ -1,6 +1,6 @@
 # JsMerge
-
-An easy way to merge all js files in a project to single file.
+[![Version](https://img.shields.io/github/v/release/RickLugtigheid/JsMerge)](https://github.com/RickLugtigheid/JsMerge/releases/latest)
+##### An easy way to merge all js files in a project to single file.
 
 ## Install
 ### Windows:
