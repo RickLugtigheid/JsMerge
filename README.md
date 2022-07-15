@@ -4,6 +4,7 @@
 
 ## Install
 ### Windows:
+- [Install .NET 6.0](https://docs.microsoft.com/en-us/dotnet/core/install/windows?tabs=net60)
 - Go to the [latest version](https://github.com/RickLugtigheid/JsMerge/releases/latest) and download the attached jsMerge-setup file.
 - Run the jsMerge setup
 - And [add the following path to the PATH environment variable](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) to use JsMerge as a command-line tool: **C:\Program Files (x86)\JsMerge**

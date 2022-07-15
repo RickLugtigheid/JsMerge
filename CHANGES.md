@@ -17,3 +17,8 @@
 - Added: Console arguments
 - Added: Logging
 - Added: Setting verbosity level
+
+## 1.15.07.2022
+- Added: watch argument option
+- Added: version argument option
+- Added: fileWatcher class

@@ -38,9 +38,12 @@ namespace JsMerge.Core
 
 						// Read the contents of the file and append it to our merge result
 						//
-						using (StreamReader stream = new StreamReader(file))
+						using (FileStream fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 						{
-							_contents.AppendLine(stream.ReadToEnd());
+							using (StreamReader stream = new StreamReader(fileStream, Encoding.Default))
+							{
+								_contents.AppendLine(stream.ReadToEnd());
+							}
 						}
 					}
 					break;

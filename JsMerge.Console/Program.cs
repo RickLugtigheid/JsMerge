@@ -22,12 +22,67 @@ namespace JsMerge
 				return;
 			}
 
-			// Create a new merge file for each config item
+			// Check if watchdog is requested
 			//
-			foreach (KeyValuePair<string, MergeConfig> configItem in Core.Main.Config)
+			if (options.Watchdog)
 			{
-				MergeResult result = Core.Main.Merge(configItem.Key, configItem.Value);
-				result.Save();
+				// Add watchers foreach config item
+				//
+				foreach (KeyValuePair<string, MergeConfig> configItem in Core.Main.Config)
+				{
+					// Add a watcher foreach file/directory incuded by this config item
+					//
+					foreach (string path in configItem.Value.include)
+					{
+						string fullPath = Core.Main.WorkDirectory + path;
+
+						FileWatcher watcher = null;
+						if (File.Exists(fullPath))
+						{
+							watcher = FileWatcher.WatchFile(fullPath);
+						}
+						else if (fullPath.EndsWith('*'))
+						{
+							fullPath = fullPath.Substring(0, fullPath.Length - 1);
+							if (Directory.Exists(fullPath))
+							{
+								watcher = FileWatcher.WatchDir(fullPath);
+							}
+						}
+
+						if (watcher != null)
+						{
+							Console.WriteLine("Added event Changed for '" + path + "'");
+							watcher.OnChange += (sender, e) =>
+							{
+								MergeResult result = Core.Main.Merge(configItem.Key, configItem.Value);
+								result.Save();
+							};
+						}
+					}
+				}
+
+				// Wait for the user to stop the watcher
+				Console.WriteLine("Type 'quit' or 'exit' to stop.");
+				string input;
+				while ((input = Console.ReadLine()) != null)
+				{
+					if (input == "quit" || input == "exit")
+					{
+						break; // Stop our program
+					}
+				}
+			}
+			// Else just trigger a merge
+			else
+			{
+				// Create a new merge file for each config item
+				//
+				foreach (KeyValuePair<string, MergeConfig> configItem in Core.Main.Config)
+				{
+					MergeResult result = Core.Main.Merge(configItem.Key, configItem.Value);
+					result.Save();
+				}
 			}
 		}
 
