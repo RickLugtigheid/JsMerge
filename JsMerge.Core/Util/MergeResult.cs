@@ -83,7 +83,16 @@ namespace JsMerge.Core
 			//
 			if (config.minify)
 			{
-				contents = new JsMinifier().Minify(_contents.ToString());
+				// Try to minify the new contents
+				try
+				{
+					contents = new JsMinifier().Minify(_contents.ToString());
+				}
+				catch (JsMinificationException e)
+				{
+					Main.Log.Error($"'{e.Message}' when trying to save merged contents for '{fileName}'");
+					return; // Don't save the contents
+				}
 
 				// Also remove newlines since the package doesn't do that automaticly
 				contents = contents.ReplaceLineEndings(string.Empty);
