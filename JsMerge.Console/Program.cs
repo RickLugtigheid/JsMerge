@@ -6,83 +6,111 @@ namespace JsMerge
 	{
 		static void Main(string[] args)
 		{
-			Options options = new Options(args);
-
-			// Initialize our Main class with our current directory
-			Core.Main.Initialize(
-				GetWorkdir(options)
-			);
-			Core.Main.Log.verbosity = options.Verbosity;
-
-			// Check if a config is present
-			//
-			if (Core.Main.Config == null)
+			try
 			{
-				Console.WriteLine($"No .jsmerge config file found in {Core.Main.WorkDirectory}");
-				return;
-			}
+				Options options = new Options(args);
 
-			// Check if watchdog is requested
-			//
-			if (options.Watchdog)
-			{
-				// Add watchers foreach config item
+				// Initialize our Main class with our current directory
+				Core.Main.Initialize(
+					GetWorkdir(options)
+				);
+				Core.Main.Log.verbosity = options.Verbosity;
+
+				// Check if a config is present
 				//
-				foreach (KeyValuePair<string, MergeConfig> configItem in Core.Main.Config)
+				if (Core.Main.Config == null)
 				{
-					// Add a watcher foreach file/directory incuded by this config item
-					//
-					foreach (string path in configItem.Value.include)
-					{
-						string fullPath = Core.Main.WorkDirectory + path;
+					Console.WriteLine($"No .jsmerge config file found in {Core.Main.WorkDirectory}");
+					return;
+				}
 
-						FileWatcher watcher = null;
-						if (File.Exists(fullPath))
+				// Check if watchdog is requested
+				//
+				if (options.Watchdog)
+				{
+					// Add watchers foreach config item
+					//
+					foreach (KeyValuePair<string, MergeConfig> configItem in Core.Main.Config)
+					{
+						// Add a watcher foreach file/directory incuded by this config item
+						//
+						foreach (string path in configItem.Value.include)
 						{
-							watcher = FileWatcher.WatchFile(fullPath);
-						}
-						else if (fullPath.EndsWith('*'))
-						{
-							fullPath = fullPath.Substring(0, fullPath.Length - 1);
-							if (Directory.Exists(fullPath))
+							// Ignore any functions like :get()
+							//
+							if (path.StartsWith(':'))
 							{
-								watcher = FileWatcher.WatchDir(fullPath);
+								continue;
+							}
+
+							// Get the full path
+							string fullPath = Path.Combine(Core.Main.WorkDirectory, path);
+
+							FileWatcher? watcher = null;
+							
+							// Check if our path ends with *
+							//
+							if (fullPath.EndsWith('*'))
+							{
+								// If so creat a watcher for this directory
+								fullPath = fullPath.Substring(0, fullPath.Length - 1);
+								if (Directory.Exists(fullPath))
+								{
+									watcher = FileWatcher.WatchDir(fullPath);
+								}
+								else
+								{
+									Core.Main.Log.Error("Can not attach watcher to '" + fullPath + '\'');
+								}
+							}
+							else if (File.Exists(fullPath))
+							{
+								watcher = FileWatcher.WatchFile(fullPath);
+							}
+							else
+							{
+								Core.Main.Log.Error("Can not attach watcher to '" + fullPath + '\'');
+							}
+
+							// Check if a watcher is created
+							if (watcher != null)
+							{
+								Console.WriteLine("Added event Changed for '" + path + "'");
+								watcher.OnChange += (sender, e) =>
+								{
+									MergeResult result = Core.Main.Merge(configItem.Key, configItem.Value);
+									result.Save();
+								};
 							}
 						}
+					}
 
-						if (watcher != null)
+					// Wait for the user to stop the watcher
+					Console.WriteLine("Type 'quit' or 'exit' to stop.");
+					string input;
+					while ((input = Console.ReadLine()) != null)
+					{
+						if (input == "quit" || input == "exit")
 						{
-							Console.WriteLine("Added event Changed for '" + path + "'");
-							watcher.OnChange += (sender, e) =>
-							{
-								MergeResult result = Core.Main.Merge(configItem.Key, configItem.Value);
-								result.Save();
-							};
+							break; // Stop our program
 						}
 					}
 				}
-
-				// Wait for the user to stop the watcher
-				Console.WriteLine("Type 'quit' or 'exit' to stop.");
-				string input;
-				while ((input = Console.ReadLine()) != null)
+				// Else just trigger a merge
+				else
 				{
-					if (input == "quit" || input == "exit")
+					// Create a new merge file for each config item
+					//
+					foreach (KeyValuePair<string, MergeConfig> configItem in Core.Main.Config)
 					{
-						break; // Stop our program
+						MergeResult result = Core.Main.Merge(configItem.Key, configItem.Value);
+						result.Save();
 					}
 				}
 			}
-			// Else just trigger a merge
-			else
+			catch (Exception e)
 			{
-				// Create a new merge file for each config item
-				//
-				foreach (KeyValuePair<string, MergeConfig> configItem in Core.Main.Config)
-				{
-					MergeResult result = Core.Main.Merge(configItem.Key, configItem.Value);
-					result.Save();
-				}
+				Core.Main.Log.Error(e.ToString());
 			}
 		}
 

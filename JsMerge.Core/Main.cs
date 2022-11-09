@@ -4,7 +4,7 @@ namespace JsMerge.Core
 {
 	public static class Main
 	{
-		public const string VERSION = "1.2.0";
+		public const string VERSION = "1.1.1";
 		#region [Sub systems]
 		/// <summary>
 		/// A subsystem for handling query strings

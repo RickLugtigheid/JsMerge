@@ -67,7 +67,14 @@ namespace JsMerge.Core
         {
             // Create a new FileSystemWatcher and set its properties.
             FileSystemWatcher watcher = new FileSystemWatcher();
-            watcher.Path = Path.GetDirectoryName(file);
+            watcher.Path = Path.GetDirectoryName(file) ?? Main.WorkDirectory;
+
+            // If the path ends with a '.' we remove it
+            //
+            if (watcher.Path.EndsWith('.'))
+			{
+                watcher.Path = watcher.Path.Substring(0, watcher.Path.Length - 1);
+			}
 
             /* Watch for changes in LastAccess and LastWrite times, and
                the renaming of files or directories. */
